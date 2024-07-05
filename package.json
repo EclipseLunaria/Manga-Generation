@@ -2,13 +2,18 @@
   "name": "puppeteer-test",
   "main": "index.ts",
   "scripts": {
-    "start": "ts-node index.ts"},
+    "start": "ts-node index.ts"
+  },
   "devDependencies": {
+    "@types/ejs": "^3.1.5",
+    "@types/fs-extra": "^11.0.4",
     "@types/puppeteer": "^7.0.4",
     "ts-node": "^10.9.2",
     "typescript": "^5.5.3"
   },
   "dependencies": {
+    "ejs": "^3.1.10",
+    "fs-extra": "^11.2.0",
     "puppeteer": "^22.12.1"
   }
 }

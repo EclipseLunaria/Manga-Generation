@@ -32,9 +32,12 @@ const ExtractChapter = async (chapter_url: string, dir_name: string) => {
     await page.evaluate((boundingBox) => {
       window.scrollTo(boundingBox.x, boundingBox.y);
     }, boundingBox);
-    await imageElement.screenshot({ path: `./${dir_name}/page-${i}.png` });
+    await imageElement.screenshot({
+      path: `./${dir_name}/page-${i}.jpeg`,
+      type: "jpeg",
+      quality: 70,
+    });
     i++;
-    
   }
 
   await browser.close();
