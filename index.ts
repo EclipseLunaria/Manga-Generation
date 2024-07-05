@@ -1,5 +1,6 @@
 import SeriesExtractor from "./src/mangaExtractor/seriesExtractor";
 import GenerateHtml from "./src/epubGenerator/generateHtml";
+import FindSeries from "./src/mangaExtractor/findSeries";
 import * as fs from "fs";
 import { convertToEpub } from "./join";
 fs.mkdirSync("./chapter-1", { recursive: true });
@@ -12,15 +13,11 @@ fs.mkdirSync("./chapter-1", { recursive: true });
     await GenerateHtml(`./${seriesName}`);
     await convertToEpub(`./${seriesName}`);
   };
-
-  await collectChaptersAndConvcertToEpub(
-    "https://chapmanganato.to/manga-ui971665/",
-    "Hajimete No Gal"
-  );
-  // await SeriesExtractor(
-  //   "https://chapmanganato.to/manga-ui971665/",
-  //   "Kimi No Love Wo Misetekure"
-  // );
-  // await GenerateHtml("./Kimi No Love Wo Misetekure");
-  // await convertToEpub("./Kimi No Love Wo Misetekure");
+  const data = await FindSeries("Alya Sometimes Hides Her Feelings In Russian");
+  if (!data?.title || !data?.link) {
+    console.log("No series found");
+    return;
+  }
+  await collectChaptersAndConvcertToEpub(data.link, data.title);
+  
 })();
