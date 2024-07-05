@@ -7,6 +7,6 @@
     "strict": true,
     "skipLibCheck": true
   },
-  "include": ["src/**/*", "join.ts"],
+  "include": ["src/**/*", "src/epubGenerator/join.ts"],
   "exclude": ["node_modules"]
 }

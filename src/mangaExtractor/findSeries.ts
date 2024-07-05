@@ -2,8 +2,12 @@ import axios from "axios";
 import { load as loadhtml } from "cheerio";
 
 const FindSeries = async (series: string) => {
+  series = series.replace(/ /g, "_").replace(/,/g, "").toLowerCase();
   try {
-    const seriesSearch = series.replace(/ /g, "_").toLowerCase();
+    const seriesSearch = series
+      .replace(/ /g, "_")
+      .replace(/,/g, "")
+      .toLowerCase();
     const searchUrl = `https://manganato.com/search/story/${seriesSearch}`;
     console.log("Searching for series:", series, "at", searchUrl);
 
@@ -17,7 +21,6 @@ const FindSeries = async (series: string) => {
 
     const stories = $(".item-img");
     if (stories.length === 0) {
-      console.log("No stories found");
       throw new Error("No stories found");
     }
     const firstStory = stories[0];

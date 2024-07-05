@@ -1,25 +1,21 @@
 import SeriesExtractor from "./src/mangaExtractor/seriesExtractor";
 import GenerateHtml from "./src/epubGenerator/generateHtml";
 import FindSeries from "./src/mangaExtractor/findSeries";
-import { convertToEpub } from "./join";
+import { convertToEpub } from "./src/epubGenerator/join";
 
 (async () => {
-  const SERIES_NAME = "Alya Sometimes Hides Her Feelings In Russian";
-
+  const SERIES_NAME = "Kimi No Love Wo Misetekure";
   const collectChaptersAndConvcertToEpub = async (
     url: string,
     seriesName: string
   ) => {
-    await SeriesExtractor(url, seriesName);
+    // await SeriesExtractor(url, seriesName);
     await GenerateHtml(`./${seriesName}`);
     await convertToEpub(`./${seriesName}`);
   };
   const data = await FindSeries(SERIES_NAME);
-  if (
-    !data?.title ||
-    !data?.link ||
-    data.title.toLowerCase() !== SERIES_NAME.toLowerCase()
-  ) {
+  console.log(data);
+  if (!data?.title || !data?.link) {
     console.log("No series found");
     return;
   }

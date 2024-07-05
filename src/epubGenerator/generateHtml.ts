@@ -2,29 +2,38 @@ import * as fs from "fs-extra";
 import * as path from "path";
 import * as ejs from "ejs";
 
-const GenerateHtml = async (seriesPath: string) => {
+const GenerateHtml = async (
+  seriesPath: string,
+  outputDir: string = seriesPath
+) => {
+  console.log("Generating HTML for", seriesPath);
   await fs.ensureDir(path.join(seriesPath, "html"));
-  const outputDir = path.join(seriesPath);
-  const chapters = (await fs.readdir(seriesPath)).sort((a: string, b: string) =>
-    sortChapters(a, b)
+  const chapterPath = path.join(seriesPath, "chapters");
+  const htmlPath = path.join(seriesPath, "html");
+
+  // const outputDir = path.join(seriesPath);
+  const chapters = (await fs.readdir(chapterPath)).sort(
+    (a: string, b: string) => sortChapters(a, b)
   );
 
   for (const chapter of chapters) {
-    const chapterPath = path.join(seriesPath, chapter);
-    const pages = (await fs.readdir(chapterPath)).sort((a: string, b: string) =>
-      sortChapters(a, b)
+    const currentChapter = path.join(chapterPath, chapter);
+    console.log(currentChapter);
+    const pages = (await fs.readdir(currentChapter)).sort(
+      (a: string, b: string) => sortChapters(a, b)
     );
     console.log(pages);
 
-    const imgPageUrl = pages
+    const imgPageUrls = pages
       .map((p: string) => {
-        return path.join(seriesPath, chapter, p);
+        console.log(path.join(chapterPath, chapter, p));
+        return path.join(chapterPath, chapter, p);
       })
       .sort((a: string, b: string) => sortChapters(a, b));
 
     const chapterHTML = await ejs.renderFile(
       path.join(__dirname, "./templates", "chapter.ejs"),
-      { chapterNumber: chapter.split("-")[1], pages: imgPageUrl }
+      { chapterNumber: chapter.split("-")[1], pages: imgPageUrls }
     );
 
     await fs.outputFile(

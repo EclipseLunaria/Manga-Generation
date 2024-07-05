@@ -1,8 +1,8 @@
 import puppeteer from "puppeteer";
-import * as fs from "fs";
-const ExtractChapter = async (chapter_url: string, dir_name: string) => {
-  console.log(dir_name);
-  fs.mkdirSync(dir_name, { recursive: true });
+import * as fs from "fs-extra";
+const ExtractChapter = async (chapter_url: string, chapterDir: string) => {
+  fs.ensureDirSync(chapterDir);
+  console.log("Extracting chapter to", chapterDir);
 
   const browser = await puppeteer.launch();
   const page = await browser.newPage();
@@ -16,7 +16,6 @@ const ExtractChapter = async (chapter_url: string, dir_name: string) => {
   const imageElements = await page.$$(".container-chapter-reader img");
   var i = 0;
   for (const imageElement of imageElements) {
-    // scroll to 0, 0
     await page.evaluate(() => window.scrollTo(0, 0));
     const boundingBox = await imageElement.boundingBox();
     if (!boundingBox || boundingBox.height < 1000) {
@@ -28,7 +27,7 @@ const ExtractChapter = async (chapter_url: string, dir_name: string) => {
     }, boundingBox);
     console.log("Taking screenshot of page", i);
     await imageElement.screenshot({
-      path: `./${dir_name}/page-${i}.jpeg`,
+      path: `./${chapterDir}/page-${i}.jpeg`,
       type: "jpeg",
       quality: 70,
     });

@@ -5,7 +5,12 @@ import * as fs from "fs-extra";
 export const convertToEpub = async (seriesPath: string) => {
   const htmlDir = path.join(seriesPath, "html");
   const outputFile = `"${seriesPath.split("/").pop()}.epub"`;
-  const coverImage = path.join(seriesPath, "chapter-1", "page-1.jpeg");
+  const coverImage = path.join(
+    seriesPath,
+    "chapters",
+    "chapter-1",
+    "page-0.jpeg"
+  );
   const metadata = `--toc --toc-depth=2 --metadata title="${seriesPath
     .split("/")
     .pop()}" --epub-cover-image="${coverImage}"`;

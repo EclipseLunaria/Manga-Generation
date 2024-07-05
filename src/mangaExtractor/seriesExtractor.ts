@@ -13,7 +13,11 @@ const SeriesExtractor = async (mangaUrl: string, seriesDir: string) => {
       continue;
     }
     console.log("Extracting chapter:", chapterName);
-    await ExtractChapter(chapter, path.join(seriesDir, chapterName));
+    console.log("Chapter url:", chapter);
+    await ExtractChapter(
+      chapter,
+      path.join(seriesDir, "chapters", chapterName)
+    );
     setTimeout(() => {}, 2000);
   }
 };

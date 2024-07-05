@@ -1,4 +1,6 @@
 import puppeteer from "puppeteer";
+import fs from "fs-extra";
+
 
 const ExtractChapterUrls = async (manga_url: string) => {
   const browser = await puppeteer.launch();
