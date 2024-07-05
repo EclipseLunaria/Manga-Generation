@@ -9,13 +9,9 @@ const ExtractChapter = async (chapter_url: string, dir_name: string) => {
   try {
     await page.goto(chapter_url, { timeout: 60000 });
   } catch {
-    console.log("retrying " + chapter_url);
-    try {
-      await page.goto(chapter_url, { timeout: 30000 });
-    } catch {
-      browser.close();
-      return;
-    }
+    console.error("Failed to load page");
+    await browser.close();
+    return;
   }
   const imageElements = await page.$$(".container-chapter-reader img");
   var i = 0;
@@ -23,15 +19,14 @@ const ExtractChapter = async (chapter_url: string, dir_name: string) => {
     // scroll to 0, 0
     await page.evaluate(() => window.scrollTo(0, 0));
     const boundingBox = await imageElement.boundingBox();
-    console.log(boundingBox);
     if (!boundingBox || boundingBox.height < 1000) {
-      console.log("Image is not visible");
       continue;
     }
 
     await page.evaluate((boundingBox) => {
       window.scrollTo(boundingBox.x, boundingBox.y);
     }, boundingBox);
+    console.log("Taking screenshot of page", i);
     await imageElement.screenshot({
       path: `./${dir_name}/page-${i}.jpeg`,
       type: "jpeg",

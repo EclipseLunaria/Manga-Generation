@@ -1,7 +1,7 @@
 import ExtractChapter from "./pageExtractor";
 import ExtractChapterUrls from "./extractChapterUrls";
-import * as fs from "fs";
 import * as path from "path";
+
 const SeriesExtractor = async (mangaUrl: string, seriesDir: string) => {
   // given manga home url
   const chapters = await ExtractChapterUrls(mangaUrl);
@@ -9,13 +9,13 @@ const SeriesExtractor = async (mangaUrl: string, seriesDir: string) => {
     const chapterName = chapter.split("/").pop();
 
     if (!chapterName) {
-      console.log("no chapter name");
+      console.log("Chapter name not found");
       continue;
     }
-    console.log(chapterName); //change
-    await ExtractChapter(chapter, path.join(seriesDir,chapterName));
+    console.log("Extracting chapter:", chapterName);
+    await ExtractChapter(chapter, path.join(seriesDir, chapterName));
     setTimeout(() => {}, 2000);
   }
 };
 
-export default SeriesExtractor
+export default SeriesExtractor;

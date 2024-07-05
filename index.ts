@@ -1,10 +1,11 @@
 import SeriesExtractor from "./src/mangaExtractor/seriesExtractor";
 import GenerateHtml from "./src/epubGenerator/generateHtml";
 import FindSeries from "./src/mangaExtractor/findSeries";
-import * as fs from "fs";
 import { convertToEpub } from "./join";
-fs.mkdirSync("./chapter-1", { recursive: true });
+
 (async () => {
+  const SERIES_NAME = "Alya Sometimes Hides Her Feelings In Russian";
+
   const collectChaptersAndConvcertToEpub = async (
     url: string,
     seriesName: string
@@ -13,11 +14,14 @@ fs.mkdirSync("./chapter-1", { recursive: true });
     await GenerateHtml(`./${seriesName}`);
     await convertToEpub(`./${seriesName}`);
   };
-  const data = await FindSeries("Alya Sometimes Hides Her Feelings In Russian");
-  if (!data?.title || !data?.link) {
+  const data = await FindSeries(SERIES_NAME);
+  if (
+    !data?.title ||
+    !data?.link ||
+    data.title.toLowerCase() !== SERIES_NAME.toLowerCase()
+  ) {
     console.log("No series found");
     return;
   }
   await collectChaptersAndConvcertToEpub(data.link, data.title);
-  
 })();
