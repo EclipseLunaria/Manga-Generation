@@ -9,7 +9,6 @@ const GenerateHtml = async (
   console.log("Generating HTML for", seriesPath);
   await fs.ensureDir(path.join(seriesPath, "html"));
   const chapterPath = path.join(seriesPath, "chapters");
-  const htmlPath = path.join(seriesPath, "html");
 
   // const outputDir = path.join(seriesPath);
   const chapters = (await fs.readdir(chapterPath)).sort(

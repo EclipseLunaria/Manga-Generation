@@ -1,7 +1,7 @@
 import SeriesExtractor from "./src/mangaExtractor/seriesExtractor";
 import GenerateHtml from "./src/epubGenerator/generateHtml";
 import FindSeries from "./src/mangaExtractor/findSeries";
-import { convertToEpub } from "./src/epubGenerator/join";
+import { ConvertToEpub } from "./src/epubGenerator";
 
 (async () => {
   const SERIES_NAME = "Kimi No Love Wo Misetekure";
@@ -11,7 +11,7 @@ import { convertToEpub } from "./src/epubGenerator/join";
   ) => {
     // await SeriesExtractor(url, seriesName);
     await GenerateHtml(`./${seriesName}`);
-    await convertToEpub(`./${seriesName}`);
+    await ConvertToEpub(`./${seriesName}`);
   };
   const data = await FindSeries(SERIES_NAME);
   console.log(data);
