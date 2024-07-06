@@ -1,13 +1,14 @@
-import ExtractChapter from "./extractChapter";
-import ExtractChapterUrls from "./extractChapterUrls";
-import FindSeries from "./findSeries";
+// import ExtractChapter from "../mangaExtraction/extractChapter";
+// import ExtractChapterUrls from "../mangaExtraction/extractChapterUrls";
+import {
+  ExtractChapterUrls,
+  ExtractChapter,
+  searchSeries,
+} from "./helpers/mangaExtractionHelpers";
 import * as path from "path";
 
-const SeriesExtractor = async (
-  SeriesName: string,
-  outputDir: string = "./"
-) => {
-  const { title, link } = await FindSeries(SeriesName);
+const ExtractSeries = async (SeriesName: string, outputDir: string = "./") => {
+  const { title, link } = await searchSeries(SeriesName);
   // given manga home url
   const chapters = await ExtractChapterUrls(link);
   for (const chapter of chapters) {
@@ -17,7 +18,6 @@ const SeriesExtractor = async (
       console.log("Chapter name not found");
       continue;
     }
-    console.log("Extracting chapter:", chapterName);
     console.log("Chapter url:", chapter);
     await ExtractChapter(
       chapter,
@@ -27,4 +27,4 @@ const SeriesExtractor = async (
   }
 };
 
-export default SeriesExtractor;
+export default ExtractSeries;
