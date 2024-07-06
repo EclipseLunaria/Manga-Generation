@@ -1,48 +1,31 @@
-import puppeteer from "puppeteer";
 import * as fs from "fs-extra";
 import axios from "axios";
 import { load as loadhtml } from "cheerio";
+import { MangaWebDriver, MangaPage } from "./WebDriver";
+ 
+export const extractChapterContent = async (chapter_url: string, seriesPath: string, chapter:string) => {
+  fs.ensureDirSync(`${seriesPath}/chapters/${chapter}`);
+  let driver = new MangaWebDriver();
+  let page;
+  try{
+    page = await driver.getPage(chapter_url);
+  const imageElements = await page.getElements(".container-chapter-reader img");
+  let j = 0;
 
-export const extractChapter = async (
-  chapter_url: string,
-  chapterDir: string
-) => {
-  fs.ensureDirSync(chapterDir);
-  console.log("Extracting chapter to", chapterDir);
-
-  const browser = await puppeteer.launch();
-  const page = await browser.newPage();
-  try {
-    await page.goto(chapter_url, { timeout: 60000 });
-  } catch {
-    console.error("Failed to load page");
-    await browser.close();
-    return;
-  }
-  const imageElements = await page.$$(".container-chapter-reader img");
-  var i = 0;
   for (const imageElement of imageElements) {
-    await page.evaluate(() => window.scrollTo(0, 0));
-    const boundingBox = await imageElement.boundingBox();
-    if (!boundingBox || boundingBox.height < 1000) {
-      continue;
+    const shotTaken = await page.screenshotElement(imageElement, `${seriesPath}/chapters/${chapter}/page-${j}.jpeg`);
+    if (shotTaken){
+      j++;
     }
-
-    await page.evaluate((boundingBox) => {
-      window.scrollTo(boundingBox.x, boundingBox.y);
-    }, boundingBox);
-
-    console.log("Taking screenshot of page", i);
-    await imageElement.screenshot({
-      path: `./${chapterDir}/page-${i}.jpeg`,
-      type: "jpeg",
-      quality: 70,
-    });
-    i++;
+  }
+} finally{
+  if (page){
+    page.close()
+  }
+  driver.close();
   }
 
-  await browser.close();
-};
+}
 
 export const extractChapterUrls = async (manga_url: string) => {
   // TODO: remove puppeteer as dependency
