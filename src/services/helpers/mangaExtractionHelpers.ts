@@ -3,7 +3,7 @@ import * as fs from "fs-extra";
 import axios from "axios";
 import { load as loadhtml } from "cheerio";
 
-export const ExtractChapter = async (
+export const extractChapter = async (
   chapter_url: string,
   chapterDir: string
 ) => {
@@ -44,7 +44,7 @@ export const ExtractChapter = async (
   await browser.close();
 };
 
-export const ExtractChapterUrls = async (manga_url: string) => {
+export const extractChapterUrls = async (manga_url: string) => {
   // TODO: remove puppeteer as dependency
   const browser = await puppeteer.launch();
   const page = await browser.newPage();
@@ -59,7 +59,7 @@ export const ExtractChapterUrls = async (manga_url: string) => {
   await browser.close();
   return chapterUrls.reverse();
 };
-export const SearchSeries = async (series: string) => {
+export const searchSeries = async (series: string) => {
   // TODO: Clean up implementation
   series = series.replace(/ /g, "_").replace(/,/g, "").toLowerCase();
 
@@ -80,13 +80,12 @@ export const SearchSeries = async (series: string) => {
   }
   const firstStory = stories[0];
   const link = $(firstStory).attr("href");
-  const title = $(firstStory).attr("title");
 
-  if (!link || !title) {
+  if (!link) {
     throw new Error("Failed to find series");
   }
 
-  return { title, link };
+  return link;
 };
 
-export default SearchSeries;
+export default searchSeries;

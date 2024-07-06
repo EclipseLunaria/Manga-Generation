@@ -1,16 +1,16 @@
 // import ExtractChapter from "../mangaExtraction/extractChapter";
 // import ExtractChapterUrls from "../mangaExtraction/extractChapterUrls";
 import {
-  ExtractChapterUrls,
-  ExtractChapter,
-  SearchSeries,
+  extractChapterUrls,
+  extractChapter,
+  searchSeries,
 } from "./helpers/mangaExtractionHelpers";
 import * as path from "path";
 
-const ExtractSeries = async (SeriesName: string, outputDir: string = "./") => {
-  const { title, link } = await SearchSeries(SeriesName);
+const extractSeries = async (SeriesName: string, outputDir: string = "./") => {
+  const link = await searchSeries(SeriesName);
   // given manga home url
-  const chapters = await ExtractChapterUrls(link);
+  const chapters = await extractChapterUrls(link);
   for (const chapter of chapters) {
     const chapterName = chapter.split("/").pop();
 
@@ -19,7 +19,7 @@ const ExtractSeries = async (SeriesName: string, outputDir: string = "./") => {
       continue;
     }
     console.log("Chapter url:", chapter);
-    await ExtractChapter(
+    await extractChapter(
       chapter,
       path.join(path.join(outputDir, SeriesName), "chapters", chapterName)
     );
@@ -27,4 +27,4 @@ const ExtractSeries = async (SeriesName: string, outputDir: string = "./") => {
   }
 };
 
-export default ExtractSeries;
+export default extractSeries;

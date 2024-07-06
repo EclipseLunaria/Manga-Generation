@@ -1,1 +1,1 @@
-export { default as GenerateHtml } from "./generateHtml";
+export { default as generateHtml } from "./generateHtml";

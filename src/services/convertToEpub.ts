@@ -2,7 +2,7 @@ import { exec } from "child_process";
 import * as path from "path";
 import * as fs from "fs-extra";
 
-const ConvertToEpub = async (seriesPath: string) => {
+const convertToEpub = async (seriesPath: string) => {
   const htmlDir = path.join(seriesPath, "html");
   const outputFile = `"${seriesPath.split("/").pop()}.epub"`;
   const coverImage = path.join(
@@ -46,4 +46,4 @@ const ConvertToEpub = async (seriesPath: string) => {
 };
 // Define the directory containing the HTML files
 
-export default ConvertToEpub;
+export default convertToEpub;
