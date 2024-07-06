@@ -5,30 +5,14 @@ import * as fs from "fs-extra";
 const convertToEpub = async (seriesPath: string) => {
   const htmlDir = path.join(seriesPath, "html");
   const outputFile = `"${seriesPath.split("/").pop()}.epub"`;
-  const coverImage = path.join(
-    seriesPath,
-    "chapters",
-    "chapter-1",
-    "page-0.jpeg"
-  );
+  
   const metadata = `--toc --toc-depth=2 --metadata title="${seriesPath
     .split("/")
-    .pop()}" --epub-cover-image="${coverImage}"`;
+    .pop()}"`;
 
   // Get a list of all HTML files in the directory
-  const htmlFiles = fs
-    .readdirSync(htmlDir)
-    .filter((file) => file.startsWith("chapter-") && file.endsWith(".html"))
-    .sort((a, b) => {
-      const aNum = parseInt(a.split("-")[1].split(".")[0]);
-      const bNum = parseInt(b.split("-")[1].split(".")[0]);
-      return aNum - bNum;
-    })
-    .map((file) => `"${path.join(htmlDir, file).replace(/\\/g, "/")}"`)
-    .join(" ");
-
-  // Build the Pandoc command
-  const pandocCommand = `pandoc ${htmlFiles} -o ${outputFile} ${metadata}`;
+  
+  const pandocCommand = `pandoc "${path.join(seriesPath,'html', "index.html")}" -o ${outputFile} ${metadata}`;
 
   // Execute the Pandoc command
   exec(pandocCommand, (error, stdout, stderr) => {

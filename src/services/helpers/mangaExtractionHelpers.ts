@@ -46,18 +46,27 @@ export const extractChapter = async (
 
 export const extractChapterUrls = async (manga_url: string) => {
   // TODO: remove puppeteer as dependency
-  const browser = await puppeteer.launch();
-  const page = await browser.newPage();
-  await page.goto(manga_url);
-  const chapterUrls = await page.$$eval(
-    ".panel-story-chapter-list a",
-    (anchors) => {
-      return anchors.map((anchor) => anchor.href);
+
+  console.log("Extracting chapter urls from", manga_url); 
+  const res = await axios.get(manga_url);
+  if (res.status !== 200) {
+    throw new Error("Failed to fetch series");
+  }
+  const html = res.data;
+  const $ = loadhtml(html);
+
+  const urls: string[] = [];
+  $(".chapter-name").each((i, el) => {
+    const url = $(el).attr("href");
+    
+    if (url) {
+      urls.push(url);
     }
-  );
-  console.log("Found", chapterUrls.length, "chapters");
-  await browser.close();
-  return chapterUrls.reverse();
+  });
+
+  console.log("Found", urls.length, "chapters");
+
+  return urls.reverse();
 };
 export const searchSeries = async (series: string) => {
   // TODO: Clean up implementation

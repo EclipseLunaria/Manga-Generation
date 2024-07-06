@@ -1,0 +1,60 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title><% seriesName%></title>
+    <link rel="stylesheet" type="text/css" href="styles.css">
+    <style>
+        html, body {
+    height: 100%;
+    margin: 0;
+    overflow: hidden;
+}
+
+body {
+    display: flex;
+    flex-direction: column;
+}
+
+.series-content {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    overflow-y: auto;
+}
+
+.series-chapters {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
+
+.chapter {
+    width: 100%;
+    display: flex;
+    justify-content: center;
+    margin-bottom: 20px; /* Optional: space between images */
+}
+
+.chapter img {
+    max-width: 100%;
+    height: auto;
+    display: block;
+}
+
+    </style>
+</head>
+    <body>    
+        <h1 class="series-title"><% seriesName%></h1>
+
+        <% for (const chaperUri of chapterImageUris) { %>
+            <% const chapterNumber = chaperUri.match(/chapter-(\d+)/)[1]; %>
+            <h2>Chapter <%= chapterNumber %></h2>
+            <div class="chapter">
+                
+                <img src="<%= chaperUri %>" alt="Chapter <%= chapterNumber %>"/>
+            </div>
+        <% } %>
+
+    </body>
+</html>
