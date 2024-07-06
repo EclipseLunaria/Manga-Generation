@@ -9,7 +9,7 @@ const ExtractChapterUrls = async (manga_url: string) => {
   const chapterUrls = await page.$$eval(
     ".panel-story-chapter-list a",
     (anchors) => {
-      return anchors.map((anchor, index) => anchor.href);
+      return anchors.map((anchor) => anchor.href);
     }
   );
   console.log("Found", chapterUrls.length, "chapters");

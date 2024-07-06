@@ -25,6 +25,8 @@ const ExtractChapter = async (chapter_url: string, chapterDir: string) => {
     await page.evaluate((boundingBox) => {
       window.scrollTo(boundingBox.x, boundingBox.y);
     }, boundingBox);
+
+    
     console.log("Taking screenshot of page", i);
     await imageElement.screenshot({
       path: `./${chapterDir}/page-${i}.jpeg`,
