@@ -3,12 +3,12 @@
 import {
   ExtractChapterUrls,
   ExtractChapter,
-  searchSeries,
+  SearchSeries,
 } from "./helpers/mangaExtractionHelpers";
 import * as path from "path";
 
 const ExtractSeries = async (SeriesName: string, outputDir: string = "./") => {
-  const { title, link } = await searchSeries(SeriesName);
+  const { title, link } = await SearchSeries(SeriesName);
   // given manga home url
   const chapters = await ExtractChapterUrls(link);
   for (const chapter of chapters) {

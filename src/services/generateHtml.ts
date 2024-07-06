@@ -1,11 +1,10 @@
 import * as fs from "fs-extra";
 import * as path from "path";
-import * as ejs from "ejs";
 import {
-  sortChapters,
-  generateChapterHTML,
-  saveChapterHtmlFile,
-  buildImagePaths,
+  SortChapters,
+  GenerateChapterHTML,
+  SaveChapterHtmlFile,
+  BuildImagePaths,
 } from "./helpers/generateHtmlHelpers";
 
 const GenerateHtml = async (seriesPath: string) => {
@@ -15,7 +14,7 @@ const GenerateHtml = async (seriesPath: string) => {
 
   // const outputDir = path.join(seriesPath);
   const chapters = (await fs.readdir(chapterPath)).sort(
-    (a: string, b: string) => sortChapters(a, b)
+    (a: string, b: string) => SortChapters(a, b)
   );
 
   for (const chapter of chapters) {
@@ -23,14 +22,14 @@ const GenerateHtml = async (seriesPath: string) => {
     console.log(currentChapter);
 
     const pages = (await fs.readdir(currentChapter)).sort(
-      (a: string, b: string) => sortChapters(a, b)
+      (a: string, b: string) => SortChapters(a, b)
     );
 
-    const chapterPageUrls = buildImagePaths(pages, currentChapter);
+    const chapterPageUrls = BuildImagePaths(pages, currentChapter);
 
-    const chapterHTML = await generateChapterHTML(chapter, chapterPageUrls);
+    const chapterHTML = await GenerateChapterHTML(chapter, chapterPageUrls);
 
-    await saveChapterHtmlFile(seriesPath, chapter, chapterHTML);
+    await SaveChapterHtmlFile(seriesPath, chapter, chapterHTML);
   }
 };
 

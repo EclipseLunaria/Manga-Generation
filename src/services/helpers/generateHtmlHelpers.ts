@@ -1,7 +1,8 @@
 import path from "path";
 import ejs from "ejs";
 import fs from "fs-extra";
-export const sortChapters = (a: string, b: string) => {
+
+export const SortChapters = (a: string, b: string) => {
   const regex = /-(\d+)/;
   const chapterNumberA = Number(a.match(regex)?.[1]);
   const chapterNumberB = Number(b.match(regex)?.[1]);
@@ -13,7 +14,7 @@ export const sortChapters = (a: string, b: string) => {
   }
 };
 
-export const generateChapterHTML = async (
+export const GenerateChapterHTML = async (
   chapter: string,
   imgPageUrls: string[]
 ) => {
@@ -23,7 +24,7 @@ export const generateChapterHTML = async (
   );
 };
 
-export const saveChapterHtmlFile = async (
+export const SaveChapterHtmlFile = async (
   seriesPath: string,
   chapter: string,
   chapterHTML: string
@@ -34,11 +35,11 @@ export const saveChapterHtmlFile = async (
   );
 };
 
-export const buildImagePaths = (pages: string[], chapterPath: string) => {
+export const BuildImagePaths = (pages: string[], chapterPath: string) => {
   return pages
     .map((p: string) => {
       console.log(path.join(chapterPath, p));
       return path.join(chapterPath, p);
     })
-    .sort((a: string, b: string) => sortChapters(a, b));
+    .sort((a: string, b: string) => SortChapters(a, b));
 };

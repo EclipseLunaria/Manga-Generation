@@ -59,7 +59,7 @@ export const ExtractChapterUrls = async (manga_url: string) => {
   await browser.close();
   return chapterUrls.reverse();
 };
-export const searchSeries = async (series: string) => {
+export const SearchSeries = async (series: string) => {
   // TODO: Clean up implementation
   series = series.replace(/ /g, "_").replace(/,/g, "").toLowerCase();
 
@@ -89,4 +89,4 @@ export const searchSeries = async (series: string) => {
   return { title, link };
 };
 
-export default searchSeries;
+export default SearchSeries;
