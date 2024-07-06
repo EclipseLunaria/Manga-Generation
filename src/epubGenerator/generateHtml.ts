@@ -2,10 +2,7 @@ import * as fs from "fs-extra";
 import * as path from "path";
 import * as ejs from "ejs";
 
-const GenerateHtml = async (
-  seriesPath: string,
-  outputDir: string = seriesPath
-) => {
+const GenerateHtml = async (seriesPath: string) => {
   console.log("Generating HTML for", seriesPath);
   await fs.ensureDir(path.join(seriesPath, "html"));
   const chapterPath = path.join(seriesPath, "chapters");
@@ -18,51 +15,52 @@ const GenerateHtml = async (
   for (const chapter of chapters) {
     const currentChapter = path.join(chapterPath, chapter);
     console.log(currentChapter);
+
     const pages = (await fs.readdir(currentChapter)).sort(
       (a: string, b: string) => sortChapters(a, b)
     );
-    console.log(pages);
 
-    const imgPageUrls = pages
-      .map((p: string) => {
-        console.log(path.join(chapterPath, chapter, p));
-        return path.join(chapterPath, chapter, p);
-      })
-      .sort((a: string, b: string) => sortChapters(a, b));
+    const imgPageUrls = buildImagePaths(pages, chapter);
 
-    const chapterHTML = await ejs.renderFile(
-      path.join(__dirname, "./templates", "chapter.ejs"),
-      { chapterNumber: chapter.split("-")[1], pages: imgPageUrls }
-    );
+    const chapterHTML = await generateChapterHTML(chapter, imgPageUrls);
 
+    await saveChapterHtmlFile(chapter, chapterHTML);
+  }
+
+  async function saveChapterHtmlFile(chapter: string, chapterHTML: string) {
     await fs.outputFile(
       path.join(seriesPath, "html", `${chapter}.html`),
       chapterHTML
     );
   }
-};
 
-const sortChapters = (a: string, b: string) => {
-  // handle case where fil contains a .jpg
-  let as = a;
-  let bs = b;
-  if (
-    (as.includes(".jpeg") && bs.includes(".jpeg")) ||
-    (as.includes(".png") && bs.includes(".png"))
-  ) {
-    as = a.split(".")[0];
-    bs = b.split(".")[0];
+  // HELPER FUNCTIONS
+  function buildImagePaths(pages: string[], chapter: string) {
+    return pages
+      .map((p: string) => {
+        console.log(path.join(chapterPath, chapter, p));
+        return path.join(chapterPath, chapter, p);
+      })
+      .sort((a: string, b: string) => sortChapters(a, b));
   }
-  as = as.split("-")[1];
-  bs = bs.split("-")[1];
+  async function generateChapterHTML(chapter: string, imgPageUrls: string[]) {
+    return await ejs.renderFile(
+      path.join(__dirname, "./templates", "chapter.ejs"),
+      { chapterNumber: chapter.split("-")[1], pages: imgPageUrls }
+    );
+  }
 
-  if (Number(as) < Number(bs)) {
-    return -1;
-  } else if (Number(as) > Number(bs)) {
-    return 1;
-  } else {
-    return 0;
-  }
+  const sortChapters = (a: string, b: string) => {
+    const regex = /-(\d+)/;
+    const chapterNumberA = Number(a.match(regex)?.[1]);
+    const chapterNumberB = Number(b.match(regex)?.[1]);
+
+    if (chapterNumberA && chapterNumberB) {
+      return chapterNumberA - chapterNumberB;
+    } else {
+      return a.localeCompare(b);
+    }
+  };
 };
 
 export default GenerateHtml;
