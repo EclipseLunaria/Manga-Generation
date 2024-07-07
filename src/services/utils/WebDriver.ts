@@ -56,17 +56,9 @@ export class MangaPage {
         return true;
     }
 
-
-    public findElements = async (selector: string) => {
-        return await this.page.$$(selector);
-    }
-
     public close = async () => {
         await this.page.close();
     }
-
-    
-
 }
 
 

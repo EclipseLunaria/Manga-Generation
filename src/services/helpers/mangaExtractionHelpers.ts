@@ -1,10 +1,32 @@
-import * as fs from "fs-extra";
+import  fs from "fs-extra";
+import path from "path";
 import axios from "axios";
 import { load as loadhtml } from "cheerio";
-import { MangaWebDriver, MangaPage } from "./WebDriver";
+import { MangaWebDriver } from "../utils/WebDriver";
+import { downloadImage } from "./imageHelpers";
  
+export const extractSeries = async (SeriesName: string, workingDir: string = "./") => {
+  const seriesPath = path.join(workingDir, SeriesName);
+  const mangaUrl = await searchSeries(SeriesName);
+  //extract metadata
+  extractCoverImage(mangaUrl,seriesPath);
+  //check for new chapters
+  const chapters = await extractChapterUrls(mangaUrl);
+  for (const chapterUrl of chapters) {
+    const chapterName = chapterUrl.split("/").pop();
+    if (!chapterName) {
+      throw Error("Chapter name not found");
+    }
+    
+    await extractChapterContent(chapterUrl, path.join(workingDir, SeriesName), chapterName);
+    setTimeout(() => {}, 2000);
+  }
+};
+
 export const extractChapterContent = async (chapter_url: string, seriesPath: string, chapter:string) => {
+  console.log("Extracting chapter: ", chapter.split("-").pop());
   fs.ensureDirSync(`${seriesPath}/chapters/${chapter}`);
+  
   let driver = new MangaWebDriver();
   let page;
   try{
@@ -13,8 +35,8 @@ export const extractChapterContent = async (chapter_url: string, seriesPath: str
   let j = 0;
 
   for (const imageElement of imageElements) {
-    const shotTaken = await page.screenshotElement(imageElement, `${seriesPath}/chapters/${chapter}/page-${j}.jpeg`);
-    if (shotTaken){
+    const pagePath = `${seriesPath}/chapters/${chapter}/page-${j}.jpeg`;
+    if (await page.screenshotElement(imageElement, pagePath)){
       j++;
     }
   }
@@ -27,57 +49,52 @@ export const extractChapterContent = async (chapter_url: string, seriesPath: str
 
 }
 
+export const extractCoverImage = async (series_url: string, seriesPath: string) => {
+  const $ = await fetchWebpage(series_url);
+  
+  const coverImageUrl = $(".info-image .img-loading").attr("src");
+  if (coverImageUrl){
+    downloadImage(coverImageUrl, `${seriesPath}/cover.jpeg`);
+  }
+}
+
+
 export const extractChapterUrls = async (manga_url: string) => {
-  // TODO: remove puppeteer as dependency
+  const $ = await fetchWebpage(manga_url);
 
-  console.log("Extracting chapter urls from", manga_url); 
-  const res = await axios.get(manga_url);
-  if (res.status !== 200) {
-    throw new Error("Failed to fetch series");
-  }
-  const html = res.data;
-  const $ = loadhtml(html);
+  const chapterUrls = $(".chapter-name").map((i, el) => {
+    return $(el).attr("href");
+  }).get();
 
-  const urls: string[] = [];
-  $(".chapter-name").each((i, el) => {
-    const url = $(el).attr("href");
-    
-    if (url) {
-      urls.push(url);
-    }
-  });
-
-  console.log("Found", urls.length, "chapters");
-
-  return urls.reverse();
+  console.log("Found", chapterUrls.length, "chapters");
+  return chapterUrls.reverse();
 };
-export const searchSeries = async (series: string) => {
-  // TODO: Clean up implementation
-  series = series.replace(/ /g, "_").replace(/,/g, "").toLowerCase();
-
-  const searchUrl = `https://manganato.com/search/story/${series}`;
-  console.log("Searching for series:", series, "at", searchUrl);
-
-  const res = await axios.get(searchUrl);
-  if (res.status !== 200) {
-    throw new Error("Failed to fetch series");
+export const searchSeries = async (seriesName: string) => {
+  seriesName = seriesName.replace(/ /g, "_").replace(/,/g, "").toLowerCase();
+  const searchUrl = `https://manganato.com/search/story/${seriesName}`;
+  console.log("Searching for series:", seriesName, "at", searchUrl);
+  
+  const $ = await fetchWebpage(searchUrl);
+  const seriesElement = $(".item-img").first();
+  if (!seriesElement) {
+    throw new Error("No series found");
   }
-
-  const html = res.data;
-  const $ = loadhtml(html);
-
-  const stories = $(".item-img");
-  if (stories.length === 0) {
-    throw new Error("No stories found");
-  }
-  const firstStory = stories[0];
-  const link = $(firstStory).attr("href");
-
-  if (!link) {
+  const seriesUrl = seriesElement.attr("href");
+  if (!seriesUrl) {
     throw new Error("Failed to find series");
   }
 
-  return link;
+  return seriesUrl;
 };
 
-export default searchSeries;
+const fetchWebpage = async (url: string) => {
+  const res = await axios.get(url);
+  if (res.status !== 200) {
+    throw new Error("Failed to fetch webpage");
+  }
+  
+  const html = res.data;
+  const $ = loadhtml(html);
+  return $;
+}
+

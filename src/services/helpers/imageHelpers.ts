@@ -2,6 +2,8 @@ import path from "path";
 import fs from "fs-extra";
 import { sortChapters } from "./generateHtmlHelpers";
 import sharp from "sharp";
+import axios from "axios";
+
 export const getCombinedChapterImages = async (seriesPath:string, workingDir:string = 'html')=> {
     const chapterPath = path.join(seriesPath, "chapters");
     const workingPath = path.join(seriesPath, workingDir);
@@ -16,8 +18,14 @@ export const getCombinedChapterImages = async (seriesPath:string, workingDir:str
         
         
         const chapterPageUris = pages.map((p: string) => path.join(currentChapter, p));
-        const combinedImage = await combineImages(chapterPageUris, workingPath, chapter);
-        chapterImages.push(combinedImage);
+        try {
+            const combinedImage = await combineImages(chapterPageUris, workingPath, chapter);
+            chapterImages.push(combinedImage);
+            
+        }
+        catch (error) {
+            console.error(`Error combining images for chapter ${chapter}: ${(error as any).message}`);
+        }
     }
     return chapterImages;
 
@@ -60,3 +68,25 @@ const combineImages = async (imagePaths:string[], outputDir:string, chapter:stri
     await combinedImage.toFile(combinedImagePath);
     return combinedImagePath;
 };
+
+
+
+export const downloadImage = async (url:string, filepath:string) => {
+    try {
+      const response = await axios({
+        url,
+        method: 'GET',
+        responseType: 'arraybuffer',
+      });
+  
+      if (response.status !== 200) {
+        throw new Error(`Failed to download image: status code ${response.status}`);
+      }
+  
+      const imageBuffer = Buffer.from(response.data, 'binary');
+      fs.writeFileSync(filepath, imageBuffer);
+      console.log(`Image downloaded to ${filepath}`);
+    } catch (error) {
+      console.error(`Error downloading the image: ${error}`);
+    }
+  };

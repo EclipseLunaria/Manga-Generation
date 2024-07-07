@@ -1,1 +1,1 @@
-export { default as generateHtml } from "./generateHtml";
+export {convertManga} from './convertManga';
